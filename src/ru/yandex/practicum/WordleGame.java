@@ -76,7 +76,7 @@ public class WordleGame {
 
 
     public void processUserInput(String userAnswer) throws WordNotFoundInDictionaryException,
-            WordIsLessOrMoreThan5Letters{
+            WordIsLessOrMoreThan5Letters {
         if (userAnswer.isBlank()) {
             getHint();
             return;// код будет работать и без этого if, но тест не пройдет
