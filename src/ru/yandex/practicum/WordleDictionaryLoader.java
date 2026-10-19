@@ -18,12 +18,11 @@ public class WordleDictionaryLoader {
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), StandardCharsets.UTF_8)) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (!line.isBlank() && (line.trim().length() == 5)) {// Здесь обрабатываем каждую строку
+                if (!line.isBlank() && (line.trim().length() == 5)) {
                     tempWords.add(line.toLowerCase().replace('ё', 'е'));
                 }
             }
         } catch (IOException e) {
-            // Обработка ошибки, если файл не найден или нет доступа
             System.out.println("Ошибка при чтении словаря " + e.getMessage());
         }
         return tempWords;

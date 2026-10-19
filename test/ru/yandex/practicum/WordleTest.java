@@ -13,7 +13,7 @@ class WordleTest {
     WordleDictionaryLoader loader = new WordleDictionaryLoader();
     WordleDictionary dictionary = loader.loadDictionary("words_ru.txt");
     WordleGame game;
-    private PrintWriter mockLogger = new PrintWriter(new OutputStreamWriter(System.out)) {
+    private final PrintWriter mockLogger = new PrintWriter(new OutputStreamWriter(System.out)) {
     };
 
     WordleTest() throws IOException {
