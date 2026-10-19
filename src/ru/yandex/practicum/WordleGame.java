@@ -57,11 +57,9 @@ public class WordleGame {
 
     public void validateInput(String userAnswer, WordleDictionary dictionary) throws WordNotFoundInDictionaryException,
             WordIsLessOrMoreThan5Letters {
-
         if (userAnswer.length() != 5) {
             throw new WordIsLessOrMoreThan5Letters("Слово должно состоять ровно из 5 букв.");
         }
-
         if (!dictionary.contains(userAnswer)) {
             throw new WordNotFoundInDictionaryException(
                     "Слова '" + userAnswer + "' нет в нашем словаре. Попробуйте другое.");
@@ -123,18 +121,6 @@ public class WordleGame {
                 }
             }
         }
-//        for (int i = 0; i < 5; i++) {
-//            if (resultChars[i] != '?') continue;
-//
-//            char c = userAnswer.charAt(i);
-//
-//            if (secretCounts.containsKey(c) && remainingCounts.get(c) > 0) {
-//                resultChars[i] = '^';
-//                remainingCounts.put(c, remainingCounts.get(c) - 1);
-//            } else {
-//                resultChars[i] = '-';
-//            }
-//        }
 
         return new String(resultChars);
     }
