@@ -1,5 +1,9 @@
 package ru.yandex.practicum;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
+
 /*
 в этом классе хранится словарь и состояние игры
     текущий шаг
@@ -15,9 +19,150 @@ package ru.yandex.practicum;
 public class WordleGame {
 
     private String answer;
+    private final PrintWriter logFile;
+    private final Set<Character> wrongLetters = new HashSet<>();
+    private final Map<Integer, Character> rightLetters = new LinkedHashMap<>();
+    private String lastHint;
 
     private int steps;
 
-    private WordleDictionary dictionary;
+    private final WordleDictionary dictionary;
 
+    public WordleGame(WordleDictionary dictionary, PrintWriter logFile) throws IOException {
+        this.steps = 6;
+        this.dictionary = dictionary;
+        this.logFile = logFile;
+        List<String> words = dictionary.getWords();
+        logFile.println("Игра началась");
+        if (!words.isEmpty()) {
+            Random random = new Random();
+            int randomIndex = random.nextInt(words.size());
+            this.answer = words.get(randomIndex);
+            logFile.println("Загадано слово " + this.answer);
+        }
+    }
+
+    public boolean isMatch(String userAnswer) {
+        if (answer.equals(userAnswer))
+            return true;
+        else {
+            this.steps = this.steps - 1;
+            return false;
+        }
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void validateInput(String userAnswer, WordleDictionary dictionary) throws WordNotFoundInDictionaryException,
+            WordIsLessOrMoreThan5Letters {
+
+        if (userAnswer.length() != 5) {
+            throw new WordIsLessOrMoreThan5Letters("Слово должно состоять ровно из 5 букв.");
+        }
+
+        if (!dictionary.contains(userAnswer)) {
+            throw new WordNotFoundInDictionaryException(
+                    "Слова '" + userAnswer + "' нет в нашем словаре. Попробуйте другое.");
+        }
+    }
+
+    public void addWrongLetterForTest(char wrongLetter) {
+        wrongLetters.add(wrongLetter);
+    }
+
+    public void addRightLetterForTest(int position, char rightLetter) {
+        rightLetters.put(position, rightLetter);
+    }
+
+
+    public void processUserInput(String userAnswer) {
+        if (userAnswer.isBlank()) {
+            getHint();
+            return;// код будет работать и без этого if, но тест не пройдет
+        }
+
+        for (int i = 0; i <= 4; i++) {
+            char c = userAnswer.charAt(i);
+            if (c == answer.charAt(i)) {
+                rightLetters.put(i, c);
+            } else if (!answer.contains(String.valueOf(c))) {
+                wrongLetters.add(c);
+            }
+        }
+        System.out.println(countChars(userAnswer));
+        logFile.println("Вывод проверки совпадения введенного слова с загаданным " + countChars(userAnswer));
+    }
+
+    public String countChars(String userAnswer) {
+        // написано со значительной помощью ИИ (где-то в ранних уроках писали указывать на это)
+        char[] resultChars = new char[5];
+        Map<Character, Integer> secretCounts = new HashMap<>();
+        for (char c : this.answer.toCharArray()) {
+            secretCounts.put(c, secretCounts.getOrDefault(c, 0) + 1);
+        }
+        Map<Character, Integer> remainingCounts = new HashMap<>(secretCounts);
+
+        for (int i = 0; i < 5; i++) {
+            char c = userAnswer.charAt(i);
+            if (c == this.answer.charAt(i)) {
+                resultChars[i] = '+';
+                rightLetters.put(i, c);
+                remainingCounts.put(c, remainingCounts.get(c) - 1);
+            } else {
+                resultChars[i] = '?';
+            }
+        }
+        for (int i = 0; i < 5; i++) {
+            if (resultChars[i] != '?') continue;
+
+            char c = userAnswer.charAt(i);
+
+            if (secretCounts.containsKey(c) && remainingCounts.get(c) > 0) {
+                resultChars[i] = '^';
+                remainingCounts.put(c, remainingCounts.get(c) - 1);
+            } else {
+                resultChars[i] = '-';
+            }
+        }
+
+        return new String(resultChars);
+    }
+
+    public String getHint() {
+        List<String> hintWords = new ArrayList<>();
+        for (String word : dictionary.getWords()) {
+            boolean isValid = true;
+            for (char c : wrongLetters) {
+                if (word.indexOf(c) != (-1)) {
+                    isValid = false;
+                    break;
+                }
+            }
+            for (Map.Entry<Integer, Character> entry : rightLetters.entrySet()) {
+                if (word.charAt(entry.getKey()) != entry.getValue()) {
+                    isValid = false;
+                    break;
+                }
+            }
+            if (isValid)
+                hintWords.add(word);
+        }
+
+        if (!hintWords.isEmpty()) {
+            Random random = new Random();
+            lastHint = hintWords.get(random.nextInt(hintWords.size()));
+            return lastHint;
+        } else
+            return null;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public String getLastHint() {
+        return lastHint;
+    }
 }
