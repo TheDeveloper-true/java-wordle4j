@@ -1,9 +1,5 @@
 package ru.yandex.practicum;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 /*
@@ -13,9 +9,7 @@ import java.util.*;
  */
 public class WordleDictionary {
 
-    private List<String> words = new ArrayList<>();
-    private final Set<Character> wrongLetters = new HashSet<>();
-    private final Map<Integer, Character> rightLetters = new LinkedHashMap<>();
+    private final List<String> words = new ArrayList<>();
 
     public List<String> getWords() {
         return words;
@@ -26,9 +20,6 @@ public class WordleDictionary {
     }
 
     public boolean contains(String newString) {
-        if (words.contains(newString))
-            return true;
-        else
-            return false;
+        return words.contains(newString);
     }
 }

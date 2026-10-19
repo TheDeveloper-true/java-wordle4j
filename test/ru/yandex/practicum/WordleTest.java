@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WordleTest {
     WordleDictionaryLoader loader = new WordleDictionaryLoader();
-    WordleDictionary dictionary = loader.loadDictionary("java-wordle4j/words_ru.txt");
+    WordleDictionary dictionary = loader.loadDictionary("words_ru.txt");
     WordleGame game;
     private PrintWriter mockLogger = new PrintWriter(new OutputStreamWriter(System.out)) {
     };
