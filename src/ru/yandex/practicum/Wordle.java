@@ -22,7 +22,8 @@ public class Wordle {
                 StandardCharsets.UTF_8)) {
             WordleDictionaryLoader loader = new WordleDictionaryLoader();
             WordleDictionary dictionary = loader.loadDictionary("words_ru.txt");
-            WordleGame game = new WordleGame(dictionary, logFile);
+            int steps = 6;
+            WordleGame game = new WordleGame(dictionary, logFile, steps);
             Scanner scanner = new Scanner(System.in);
             System.out.println(game.getAnswer());
             while (true) {
@@ -35,7 +36,6 @@ public class Wordle {
                         logFile.println("Получена подсказка " + game.getHint());
                         continue;
                     }
-                    game.validateInput(userAnswer, dictionary);
                     game.processUserInput(userAnswer);
                     if (game.isMatch(userAnswer)) {
                         System.out.println("Вы угадали слово");
@@ -44,7 +44,7 @@ public class Wordle {
                         System.out.println("Ходы закончились! Загаданное слово " + game.getAnswer());
                         break;
                     }
-                } catch (WordNotFoundInDictionaryException | WordIsLessOrMoreThan5Letters e) {
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                     logFile.println("Ошибка ввода пользователя");
                 }

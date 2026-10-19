@@ -23,19 +23,23 @@ public class WordleGame {
     private final Set<Character> wrongLetters = new HashSet<>();
     private final Map<Integer, Character> rightLetters = new LinkedHashMap<>();
     private String lastHint;
+    Random random = new Random();
 
     private int steps;
 
     private final WordleDictionary dictionary;
 
-    public WordleGame(WordleDictionary dictionary, PrintWriter logFile) throws IOException {
-        this.steps = 6;
+    public WordleGame(WordleDictionary dictionary, PrintWriter logFile, int steps) throws IOException {
+        this.steps = steps;
         this.dictionary = dictionary;
         this.logFile = logFile;
         List<String> words = dictionary.getWords();
         logFile.println("Игра началась");
+        setAnswer(words);
+    }
+
+    public void setAnswer(List<String> words) {
         if (!words.isEmpty()) {
-            Random random = new Random();
             int randomIndex = random.nextInt(words.size());
             this.answer = words.get(randomIndex);
             logFile.println("Загадано слово " + this.answer);
@@ -43,12 +47,8 @@ public class WordleGame {
     }
 
     public boolean isMatch(String userAnswer) {
-        if (answer.equals(userAnswer))
-            return true;
-        else {
-            this.steps = this.steps - 1;
-            return false;
-        }
+        this.steps--;
+        return answer.equals(userAnswer);
     }
 
     public String getAnswer() {
@@ -77,11 +77,14 @@ public class WordleGame {
     }
 
 
-    public void processUserInput(String userAnswer) {
+    public void processUserInput(String userAnswer) throws WordNotFoundInDictionaryException,
+            WordIsLessOrMoreThan5Letters{
         if (userAnswer.isBlank()) {
             getHint();
             return;// код будет работать и без этого if, но тест не пройдет
         }
+
+        validateInput(userAnswer, dictionary);
 
         for (int i = 0; i <= 4; i++) {
             char c = userAnswer.charAt(i);
@@ -111,21 +114,27 @@ public class WordleGame {
                 rightLetters.put(i, c);
                 remainingCounts.put(c, remainingCounts.get(c) - 1);
             } else {
-                resultChars[i] = '?';
+                char ch = userAnswer.charAt(i);
+                if (secretCounts.containsKey(ch) && remainingCounts.get(ch) > 0) {
+                    resultChars[i] = '^';
+                    remainingCounts.put(ch, remainingCounts.get(ch) - 1);
+                } else {
+                    resultChars[i] = '-';
+                }
             }
         }
-        for (int i = 0; i < 5; i++) {
-            if (resultChars[i] != '?') continue;
-
-            char c = userAnswer.charAt(i);
-
-            if (secretCounts.containsKey(c) && remainingCounts.get(c) > 0) {
-                resultChars[i] = '^';
-                remainingCounts.put(c, remainingCounts.get(c) - 1);
-            } else {
-                resultChars[i] = '-';
-            }
-        }
+//        for (int i = 0; i < 5; i++) {
+//            if (resultChars[i] != '?') continue;
+//
+//            char c = userAnswer.charAt(i);
+//
+//            if (secretCounts.containsKey(c) && remainingCounts.get(c) > 0) {
+//                resultChars[i] = '^';
+//                remainingCounts.put(c, remainingCounts.get(c) - 1);
+//            } else {
+//                resultChars[i] = '-';
+//            }
+//        }
 
         return new String(resultChars);
     }
@@ -151,7 +160,6 @@ public class WordleGame {
         }
 
         if (!hintWords.isEmpty()) {
-            Random random = new Random();
             lastHint = hintWords.get(random.nextInt(hintWords.size()));
             return lastHint;
         } else

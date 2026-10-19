@@ -13,6 +13,7 @@ class WordleTest {
     WordleDictionaryLoader loader = new WordleDictionaryLoader();
     WordleDictionary dictionary = loader.loadDictionary("words_ru.txt");
     WordleGame game;
+    int steps = 6;
     private final PrintWriter mockLogger = new PrintWriter(new OutputStreamWriter(System.out)) {
     };
 
@@ -21,7 +22,7 @@ class WordleTest {
 
     @BeforeEach
     void prepareNewGame() throws IOException {
-        this.game = new WordleGame(dictionary, mockLogger);
+        this.game = new WordleGame(dictionary, mockLogger, steps);
     }
 
     @Test
@@ -56,7 +57,7 @@ class WordleTest {
     }
 
     @Test
-    void testWithEmptyInput() {
+    void testWithEmptyInput() throws WordNotFoundInDictionaryException {
         game.processUserInput("");
         assertEquals(6, game.getSteps());
         assertNotNull(game.getLastHint());
