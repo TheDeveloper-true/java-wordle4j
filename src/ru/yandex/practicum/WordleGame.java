@@ -55,8 +55,7 @@ public class WordleGame {
         return answer;
     }
 
-    public void validateInput(String userAnswer, WordleDictionary dictionary) throws WordNotFoundInDictionaryException,
-            WordIsLessOrMoreThan5Letters {
+    public void validateInput(String userAnswer, WordleDictionary dictionary) {
         if (userAnswer.length() != 5) {
             throw new WordIsLessOrMoreThan5Letters("Слово должно состоять ровно из 5 букв.");
         }
